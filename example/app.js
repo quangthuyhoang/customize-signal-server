@@ -1,5 +1,5 @@
 const http = require('http');
-const SimplePeerServer = require('simple-peer-server');
+const SimplePeerServer = require('../src/simple-peer-server');
 
 const server = http.createServer();
 const spServer = new SimplePeerServer(server, true);

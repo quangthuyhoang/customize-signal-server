@@ -29,8 +29,8 @@ class SimplePeerServer {
       socket.on('sending signal', (message) =>
         this._handleSendSignal(message, socket),
       );
-      socket.on('create or join', () =>
-        this._handleCreateOrJoin(socket, ioServer),
+      socket.on('create or join', (roomId) =>
+        this._handleCreateOrJoin(roomId, socket, ioServer),
       );
       socket.on('hangup', () => this._handleHangup(socket));
       socket.on('disconnect', (reason) =>
@@ -56,14 +56,14 @@ class SimplePeerServer {
     socket.to(message.room).emit('sending signal', message);
   }
 
-  _handleCreateOrJoin(socket, ioServer) {
+  _handleCreateOrJoin(roomId, socket, ioServer) {
     const clientIds = Array.from(ioServer.sockets.sockets.keys());
     const numClients = clientIds.length;
-
+    console.log('incoming room id:', roomId)
     this.debug && console.log('NUMCLIENTS, ' + numClients);
-
+    // client should have the room id 
     if (numClients === 1) {
-      const room = this._createRoom();
+      const room = this._createRoom(roomId);
       socket.join(room);
       socket.emit('created', room, socket.id);
 
@@ -110,8 +110,10 @@ class SimplePeerServer {
     }
   }
 
-  _createRoom() {
-    const room = 'room' + this.roomCounter;
+  _createRoom(roomId) {
+    
+    // const room = 'room' + this.roomCounter;
+    const room = roomId;
     this.rooms.push(room);
     this.debug && console.log('number of rooms ' + this.rooms.length);
     this.roomCounter++;
